@@ -1,0 +1,4 @@
+# Payment architecture — not implemented
+No checkout, webhook, donor storage, recurring billing, or live merchant integration exists. Stripe, Paystack, and Flutterwave are candidates requiring official eligibility research, not selected providers.
+
+Confirm each foundation's jurisdiction, legal approval, settlement bank, currencies, and recurring needs. Default to separate merchant accounts. Resolve configuration on the backend from the recipient organization. Use hosted checkout; never store card credentials. Verify signature, account, amount, currency, reference, and status server-side. Apply event uniqueness, transactions, row locking, safe retries, refund records, reconciliation, and an outbox for receipts. A return URL never proves payment. Approve tax wording separately. Sandbox and live accounts must remain separate.

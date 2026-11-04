@@ -1,0 +1,35 @@
+name: Foundation checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-bookworm
+        env:
+          POSTGRES_DB: vineyard
+          POSTGRES_USER: vineyard
+          POSTGRES_PASSWORD: local-only
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U vineyard -d vineyard"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci
+      - run: npm run build
+      - run: npm run typecheck
+      - run: npx playwright install --with-deps chromium --no-shell
+      - run: npm run test:web -- --workers=2
+      - run: pip install -r apps/api/requirements.txt
+      - run: python apps/api/manage.py check
+      - run: python apps/api/manage.py test config
